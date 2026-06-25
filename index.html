@@ -232,14 +232,7 @@
 <!-- SETUP: isi URL API pertama kali -->
 <div id="setup-banner" class="hidden">
   <div class="setup-card">
-    <svg width="90" height="28" viewBox="0 0 240 76" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:12px">
-      <path d="M0 10 Q0 0 10 0 L38 0 L38 14 L16 14 L16 62 L38 62 L38 42 L26 42 L26 28 L52 28 L52 76 L10 76 Q0 76 0 66 Z" fill="#3D1A00"/>
-      <polygon points="80,0 120,76 40,76" fill="#D4A017"/>
-      <path d="M130 0 L168 0 Q178 0 178 10 L178 30 Q178 38 168 38 L142 38 Q140 38 140 40 L140 62 L168 62 L168 50 L154 50 L154 38 L178 38 L178 66 Q178 76 168 76 L130 76 Q120 76 120 66 L120 46 Q120 38 130 38 L156 38 Q158 38 158 36 L158 14 L130 14 Z" fill="#3D1A00"/>
-      <rect x="188" y="0" width="16" height="76" rx="3" fill="#3D1A00"/>
-      <rect x="224" y="0" width="16" height="76" rx="3" fill="#3D1A00"/>
-      <rect x="188" y="31" width="52" height="14" rx="3" fill="#3D1A00"/>
-    </svg>
+    <img src="logo.png" alt="GASH" style="width:120px;height:auto;display:block;margin:0 auto 12px;">
     <h2>Setup BILL-GASH</h2>
     <p>Masukkan URL Web App dari Google Apps Script Anda. URL ini didapat setelah Anda men-deploy Apps Script sebagai Web App.</p>
     <input type="text" id="setup-url" placeholder="https://script.google.com/macros/s/AKfy.../exec">
@@ -442,11 +435,23 @@ let STATE = { clients: [], payments: [] };
 // ══════════════════════════════════════════════════════════════
 async function api(action, data={}) {
   const url = getApiUrl();
-  const res = await fetch(`${url}?action=${action}`, {
-    method: 'POST',
-    body: JSON.stringify({ action, data }),
-  });
-  const json = await res.json();
+  const isRead = action==='getClients' || action==='getPayments';
+  let res;
+  if (isRead) {
+    res = await fetch(`${url}?action=${action}`, {
+      method: 'GET', redirect: 'follow'
+    });
+  } else {
+    res = await fetch(`${url}?action=${action}`, {
+      method: 'POST', redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action, data, id: data?.id }),
+    });
+  }
+  const text = await res.text();
+  let json;
+  try { json = JSON.parse(text); }
+  catch(e) { throw new Error('Response tidak valid: ' + text.slice(0,120)); }
   if (!json.ok) throw new Error(json.error || 'API error');
   return json.data;
 }
