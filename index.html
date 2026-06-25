@@ -159,9 +159,69 @@
   .toast.info { border-color:rgba(200,150,12,.4);color:var(--yellow); }
   @keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
   .sync-status { font-size:11px;color:rgba(212,160,23,0.5);text-align:center;margin-top:6px; }
+
+  /* ── RESPONSIVE ── */
+  /* Hamburger button - hanya tampil di HP */
+  .hamburger {
+    display:none; position:fixed; top:12px; left:12px; z-index:200;
+    width:40px; height:40px; border-radius:8px;
+    background:var(--brown); border:1px solid var(--gold);
+    cursor:pointer; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+  }
+  .hamburger span { display:block; width:20px; height:2px; background:var(--gold); border-radius:2px; transition:all .25s; }
+
+  /* Overlay gelap saat sidebar terbuka di HP */
+  .sidebar-overlay {
+    display:none; position:fixed; inset:0; background:rgba(61,26,0,.5);
+    z-index:99; backdrop-filter:blur(2px);
+  }
+  .sidebar-overlay.open { display:block; }
+
+  @media (max-width: 768px) {
+    /* Sidebar tersembunyi di kiri, slide masuk saat dibuka */
+    .sidebar {
+      transform:translateX(-100%);
+      transition:transform .25s ease;
+      width:240px;
+    }
+    .sidebar.open { transform:translateX(0); }
+
+    /* Hamburger muncul */
+    .hamburger { display:flex; }
+
+    /* Main full width tanpa margin */
+    .main { margin-left:0; padding:16px; padding-top:60px; }
+
+    /* Form row jadi 1 kolom */
+    .form-row { grid-template-columns:1fr; }
+
+    /* Stat grid 2 kolom */
+    .stat-grid { grid-template-columns:1fr 1fr; }
+
+    /* Page header stack vertikal */
+    .page-header { flex-direction:column; gap:10px; }
+
+    /* Toast lebih kecil di HP */
+    .toast { left:16px; right:16px; bottom:16px; text-align:center; }
+
+    /* Table scroll horizontal */
+    .table-wrap { -webkit-overflow-scrolling:touch; }
+    td, th { padding:8px 10px; font-size:12px; }
+  }
+
+  @media (max-width: 400px) {
+    .stat-grid { grid-template-columns:1fr; }
+    .stat-card .stat-val { font-size:18px; }
+  }
 </style>
 </head>
 <body>
+
+<!-- HAMBURGER (HP) -->
+<button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+  <span></span><span></span><span></span>
+</button>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 
 <!-- LOADING -->
 <div id="loading-overlay">
@@ -192,18 +252,18 @@
 <nav class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-svg">
-      <img src="logo.png" alt="GASH" style="width:140px; height:auto; display:block; margin:0 auto;">
+      <img src="logo.png" alt="GASH" style="width:140px;height:auto;display:block;margin:0 auto;">
     </div>
     <h1>BILL-GASH</h1>
     <span>Billing Management</span>
   </div>
   <div class="sidebar-nav">
     <div class="nav-label">Menu</div>
-    <div class="nav-item active" onclick="showPage('dashboard')"><span class="icon">🏠</span> Dashboard</div>
-    <div class="nav-item" onclick="showPage('clients')"><span class="icon">👥</span> Pelanggan</div>
-    <div class="nav-item" onclick="showPage('payment')"><span class="icon">💳</span> Pembayaran</div>
-    <div class="nav-item" onclick="showPage('history')"><span class="icon">📋</span> Riwayat</div>
-    <div class="nav-item" onclick="showPage('status')"><span class="icon">📊</span> Status Bulanan</div>
+    <div class="nav-item active" onclick="showPage('dashboard');closeSidebar()"><span class="icon">🏠</span> Dashboard</div>
+    <div class="nav-item" onclick="showPage('clients');closeSidebar()"><span class="icon">👥</span> Pelanggan</div>
+    <div class="nav-item" onclick="showPage('payment');closeSidebar()"><span class="icon">💳</span> Pembayaran</div>
+    <div class="nav-item" onclick="showPage('history');closeSidebar()"><span class="icon">📋</span> Riwayat</div>
+    <div class="nav-item" onclick="showPage('status');closeSidebar()"><span class="icon">📊</span> Status Bulanan</div>
   </div>
   <div class="sidebar-bottom">
     <button class="sync-btn" onclick="syncAll()">🔄 Sinkronisasi</button>
@@ -738,6 +798,18 @@ if(!getApiUrl()) {
   document.getElementById('setup-banner').classList.remove('hidden');
 } else {
   init();
+}
+
+// ── SIDEBAR MOBILE ────────────────────────────────────────────
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('open');
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
 }
 </script>
 </body>
