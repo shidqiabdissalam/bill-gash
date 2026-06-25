@@ -229,18 +229,6 @@
   <p>Memuat data dari Google Sheets...</p>
 </div>
 
-<!-- SETUP: isi URL API pertama kali -->
-<div id="setup-banner" class="hidden">
-  <div class="setup-card">
-    <img src="logo.png" alt="GASH" style="width:120px;height:auto;display:block;margin:0 auto 12px;">
-    <h2>Setup BILL-GASH</h2>
-    <p>Masukkan URL Web App dari Google Apps Script Anda. URL ini didapat setelah Anda men-deploy Apps Script sebagai Web App.</p>
-    <input type="text" id="setup-url" placeholder="https://script.google.com/macros/s/AKfy.../exec">
-    <button class="btn btn-primary" style="width:100%;" onclick="saveApiUrl()">💾 Simpan & Mulai</button>
-    <p style="margin-top:12px;font-size:12px;text-align:center;">Belum punya URL? Ikuti panduan setup yang disertakan.</p>
-  </div>
-</div>
-
 <!-- SIDEBAR -->
 <nav class="sidebar">
   <div class="sidebar-logo">
@@ -410,20 +398,12 @@
 
 <script>
 // ══════════════════════════════════════════════════════════════
-//  CONFIG
+//  CONFIG — URL API permanen
 // ══════════════════════════════════════════════════════════════
-const API_KEY = 'isp_billing_api_url';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxp4EvQCt1iGDrcnn616-oSeSfB9f4gHJfQoN5CISTDc0Crmq24SMOffqWr9XlW63Yh/exec';
 
-function getApiUrl() { return localStorage.getItem(API_KEY) || ''; }
-function saveApiUrl() {
-  const url = document.getElementById('setup-url').value.trim();
-  if (!url.startsWith('https://script.google.com')) {
-    alert('URL tidak valid. Pastikan URL berasal dari Google Apps Script.'); return;
-  }
-  localStorage.setItem(API_KEY, url);
-  document.getElementById('setup-banner').classList.add('hidden');
-  init();
-}
+function getApiUrl() { return API_URL; }
+function saveApiUrl() {} // tidak dipakai lagi
 
 // ══════════════════════════════════════════════════════════════
 //  STATE — data cache di memori
@@ -797,13 +777,8 @@ async function init() {
   }
 }
 
-// Cek apakah URL API sudah disimpan
-if(!getApiUrl()) {
-  document.getElementById('loading-overlay').classList.add('hidden');
-  document.getElementById('setup-banner').classList.remove('hidden');
-} else {
-  init();
-}
+// Langsung load data tanpa perlu setup
+init();
 
 // ── SIDEBAR MOBILE ────────────────────────────────────────────
 function toggleSidebar() {
